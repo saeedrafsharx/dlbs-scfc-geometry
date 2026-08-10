@@ -1,0 +1,2 @@
+id_col,age_col,train_mean_age,train_sd_age,n_train,test_mean_age,test_sd_age,n_test,ttest_p,mannwhitney_p
+participant_id,AgeCog_W1,54.303703703703704,21.313324986991248,135,52.35087719298246,19.875048273140095,57,0.5548680403375683,0.5998744083770781

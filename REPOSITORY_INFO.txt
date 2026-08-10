@@ -1,0 +1,22 @@
+Repository name: dlbs-scfc-geometry
+
+Description: Reproducible analysis of cortical geometry, structural connectivity, and resting-state functional connectivity in the Dallas Lifespan Brain Study.
+
+GitHub topics:
+neuroimaging
+computational-neuroscience
+network-neuroscience
+fmri
+dti
+structural-connectivity
+functional-connectivity
+structure-function-coupling
+cortical-geometry
+brain-networks
+nilearn
+dipy
+phase-locking-value
+ridge-regression
+dallas-lifespan-brain-study
+schaefer-atlas
+python

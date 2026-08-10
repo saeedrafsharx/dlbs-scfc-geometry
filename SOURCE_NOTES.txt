@@ -1,0 +1,6 @@
+Source notebooks:
+- cp-multi-model-bulletproof-may-10th-partC (2).ipynb
+- coupling-potential-dlbs-validation-2.ipynb
+
+The repository scripts are a cleaned script-based organization of the uploaded analysis.
+Notebook execution metadata, outputs, notebook cells, and hard-coded Kaggle paths were removed or replaced with configurable paths.
