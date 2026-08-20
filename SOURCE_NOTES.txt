@@ -4,3 +4,19 @@ Source notebooks:
 
 The repository scripts are a cleaned script-based organization of the uploaded analysis.
 Notebook execution metadata, outputs, notebook cells, and hard-coded Kaggle paths were removed or replaced with configurable paths.
+
+Additional source scripts (v3 pipeline update):
+- dlbs_pipeline_v3.py
+- diagnose_qc.py
+- check_reproducibility.py
+
+dlbs_pipeline_v3.py is a from-scratch rewrite of the Stage 1 structural/functional
+connectome pipeline, replacing the affine-atlas-resampling approach in
+run_coupling_potential.py (kept for reference as the original v2 pipeline) with
+ANTsPy-based nonlinear (SyN) registration, corrected transform inversion, and
+numerous correctness, speed, and quality fixes documented in the module
+docstring. diagnose_qc.py and check_reproducibility.py are quality-control
+utilities that operate on dlbs_pipeline_v3.py's outputs. Hard-coded Kaggle
+paths in all three were replaced with the repository's existing
+environment-variable/relative-path convention; behavior is otherwise
+unchanged from the uploaded source.

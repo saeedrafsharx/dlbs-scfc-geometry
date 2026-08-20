@@ -16,5 +16,6 @@ dependencies = [
     "nibabel",
     "nilearn",
     "dipy",
+    "antspyx",
     "tqdm",
 ]

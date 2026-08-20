@@ -6,4 +6,5 @@ matplotlib
 nibabel
 nilearn
 dipy
+antspyx
 tqdm
