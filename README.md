@@ -35,8 +35,11 @@ The workflow uses a fixed random seed by default and keeps the test cohort separ
 ```text
 dlbs-scfc-geometry/
 ├── scripts/
-│   ├── run_coupling_potential.py
-│   └── run_scfc_models.py
+│   ├── run_coupling_potential.py   # Stage 1, v2 (affine atlas resampling)
+│   ├── dlbs_pipeline_v3.py         # Stage 1, v3 (recommended; ANTs SyN registration)
+│   ├── diagnose_qc.py              # QC: separate bad-warp subjects from genuine coverage loss
+│   ├── check_reproducibility.py    # QC: process one subject twice and compare
+│   └── run_scfc_models.py          # Stage 2
 ├── results/
 │   ├── figures/
 │   ├── tables/
@@ -65,6 +68,7 @@ Main dependencies:
 - Nilearn
 - NiBabel
 - DIPY
+- ANTsPy (`antspyx`), required by `dlbs_pipeline_v3.py`
 - tqdm
 - CuPy, optional for GPU acceleration
 
@@ -114,6 +118,72 @@ DLBS_N_SUBJECTS=10 python scripts/run_coupling_potential.py
 ```
 
 The DTI pipeline uses deterministic tractography, a fractional anisotropy stopping criterion, streamline length filtering, and atlas-based endpoint assignment. fMRI processing applies smoothing and bandpass filtering before parcel time-series extraction and PLV calculation.
+
+## Stage 1, v3: dlbs_pipeline_v3.py (recommended)
+
+`scripts/dlbs_pipeline_v3.py` is a rewrite of Stage 1 that replaces the affine
+atlas resampling used in `run_coupling_potential.py` with proper ANTsPy
+(`antspyx`) nonlinear (SyN) registration through a T1 anatomical image, and
+fixes a transform-inversion bug in the v2 pipeline that misplaced the atlas in
+native DWI space. The module docstring documents every correctness, speed,
+and quality change versus v2 in detail. `run_coupling_potential.py` is kept
+in the repository for reference as the original v2 pipeline.
+
+Because it registers through a T1 image, this pipeline additionally requires
+a BIDS-like anatomical directory:
+
+```bash
+export DLBS_FMRI_BASE=/path/to/dlbs_rsfmri/ds004856
+export DLBS_DTI_BASE=/path/to/dlbs_dwi/ds004856
+export DLBS_ANAT_BASE=/path/to/dlbs_anat/ds004856
+export DLBS_ATLAS_DIR=/path/to/schaefer_2018   # must contain the Schaefer-100 nii + label files
+export DLBS_OUTPUT_DIR=./results
+export DLBS_CHECKPOINT_DIR=./checkpoints
+```
+
+Subjects are processed in batches for parallel/resumable runs:
+
+```python
+import dlbs_pipeline_v3 as P
+P.run_batch_pipeline(batch_id=0, n_batches=12)   # full SC + FC pipeline
+P.run_sc_only_pipeline(batch_id=0, n_batches=12) # structural connectivity only
+P.debug_one_subject("sub-1003")                  # single-subject debug run
+```
+
+Set `DLBS_DETERMINISTIC=1` to force single-threaded ANTs registration for
+bit-identical reruns (slower). `DLBS_MNI_TEMPLATE` overrides the MNI template
+path; otherwise it is fetched through Nilearn.
+
+Structural connectivity is saved with four edge weightings (`count`,
+`invlen`, `density`, `mean_length`) instead of raw streamline count alone,
+and per-subject QC (atlas warp ratio, framewise displacement, streamline
+counts, and more) is written to `<output>/qc/*.json`.
+
+### QC utilities
+
+`scripts/diagnose_qc.py` separates subjects whose registration failed from
+parcels with genuine coverage loss, iterating until both sets stabilize, and
+writes an exclusion list:
+
+```python
+import diagnose_qc as D
+result = D.run()                                       # iterate to convergence
+result = D.run(label_path="/path/Schaefer...order.txt") # use real parcel names
+```
+
+It expects `<DLBS_CONNECTOME_DIR>/group/subjects.txt` and `.../group/sc_count.npy`
+(a stacked subjects x parcels x parcels array) plus `.../qc/qc_table.csv`,
+which are produced by aggregating the per-subject QC and SC outputs of Stage 1.
+
+`scripts/check_reproducibility.py` reprocesses one subject twice with
+`dlbs_pipeline_v3.py` and reports edge-presence agreement, edge-weight
+correlation, and coupling-potential metric stability across streamline
+thresholds. Run this before launching a full-cohort batch:
+
+```python
+import check_reproducibility as R
+R.check("sub-1093")
+```
 
 ## Stage 2: held-out model comparison
 
