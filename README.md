@@ -93,6 +93,8 @@ export DLBS_DTI_DIR=/path/to/dlbs_dwi/ds004856
 
 The processing stage discovers subjects with complete DTI and fMRI data, fetches the 100 parcel Schaefer atlas through Nilearn, and writes subject-level matrices to the output directory.
 
+Precomputed structural and functional connectomes produced by this pipeline are published as a Kaggle dataset: [DLBS Connectome](https://www.kaggle.com/datasets/saeedrezaeiafshar/dlbs-connectome).
+
 ## Stage 1: coupling potential validation
 
 Run:

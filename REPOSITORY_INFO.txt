@@ -2,6 +2,8 @@ Repository name: dlbs-scfc-geometry
 
 Description: Reproducible analysis of cortical geometry, structural connectivity, and resting-state functional connectivity in the Dallas Lifespan Brain Study.
 
+Dataset: https://www.kaggle.com/datasets/saeedrezaeiafshar/dlbs-connectome
+
 GitHub topics:
 neuroimaging
 computational-neuroscience
